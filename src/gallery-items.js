@@ -63,14 +63,94 @@ const imgs = [
     description: "Lighthouse Coast Sea",
   },
 ];
-//змінні
+//
 const galleryContainer = document.querySelector(".js-gallery");
 const backDrop = document.querySelector(".lightbox");
-const backDropImgs = document.querySelector(".lightbox__image");
+const backDropImges = document.querySelector(".lightbox__image");
 const backDropOverlay = document.querySelector(".lightbox__overlay");
 const modalButtonClose = document.querySelector(
-  'bubtton[data-action="close-lightbox"]'
+  'button[data-action="close-lightbox"]'
 );
-const galleryCardsMarkup = createCardsMarkup(imgs);
+const galleryListMarkup = createCardsMarkup(imgs);
+//
+galleryContainer.insertAdjacentHTML("beforeend", galleryListMarkup);
+galleryContainer.addEventListener("click", onGalleryContainerClick);
+backDropOverlay.addEventListener("click", onBackDropClick);
+modalButtonClose.addEventListener("click", onButtonClose);
 
-galleryContainer.insertAdjacentHTML("beforeend", galleryCardsMarkup);
+function onGalleryContainerClick(event) {
+  if (event.target.nodeName !== "IMG") {
+    return;
+  }
+  event.preventDefault();
+  console.log(event.target.dataset.source);
+  backDrop.classList.add("is-open");
+  backDropImges.src = event.target.dataset.source;
+  window.addEventListener("keydown", onEscPress);
+  window.addEventListener("keydown", onArrowRightPress);
+  window.addEventListener("keydown", onArrowLeftPress);
+}
+
+function onButtonClose() {
+  backDrop.classList.remove("is-open");
+  backDropImges.src = "";
+}
+function onBackDropClick(event) {
+  if (event.currentTarget === event.target) {
+    onButtonClose();
+  }
+}
+function onEscPress(event) {
+  if (event.code === "Escape") {
+    onButtonClose();
+  }
+}
+
+function onArrowRightPress(event) {
+  if (event.code === "ArrowRight") {
+    let backDropSrc = backDropImges.src;
+    let nextIndex = null;
+    imgs.find((img, i) => {
+      nextIndex = i;
+      if (img.original === backDropSrc && i !== imgs.length - 1) {
+        nextIndex = i + 1;
+        return true;
+      }
+    });
+    backDropImges.src = imgs[nextIndex].original;
+  }
+}
+
+function onArrowLeftPress(event) {
+  if (event.code === "ArrowLeft") {
+    let backDropSrc = backDropImges.src;
+    let nextIndex = 0;
+    imgs.find((img, i) => {
+      if (img.original === backDropSrc && i > 0) {
+        nextIndex = i - 1;
+        return true;
+      }
+    });
+    backDropImges.src = imgs[nextIndex].original;
+  }
+}
+
+function createCardsMarkup(imgs) {
+  return imgs
+    .map(({ preview, original, description }) => {
+      return `<li class="gallery__item">
+      <a
+        class="gallery__link"
+        href="${original}"
+      >
+        <img
+        class="gallery__image"
+        src="${preview}"
+        data-source="${original}"
+        alt="${description}"
+        />
+      </a>
+    </li>`;
+    })
+    .join("");
+}
