@@ -94,7 +94,6 @@ function onGalleryContainerClick(event) {
 function onButtonClose() {
   backDrop.classList.remove("is-open");
   backDropImges.src = "";
-  backDropImges.alt = "";
   window.removeEventListener("keydown", onEscPress);
   window.removeEventListener("keydown", onArrowRightPress);
   window.removeEventListener("keydown", onArrowLeftPress);
